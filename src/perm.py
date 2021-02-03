@@ -111,13 +111,13 @@ def Perm(n):
             while remaining:
                 a = remaining.pop()
                 cycle = [a]
-                b = self[a]
+                b = self.mapping[a]
                 # this could of course be done beautifully with the walrus operator,
                 # but I'm trying to keep my Ubuntu-using fans happy
                 while b != a:
                     remaining.remove(b)
                     cycle.append(b)
-                    b = self[b]
+                    b = self.mapping[b]
                 if len(cycle) > 1:
                     decomposition.append(cycle)
             return decomposition
@@ -177,7 +177,7 @@ def Perm(n):
             """
             Show the underlying dictionary object
             """
-            return "{}({})".format(type(self).__name__, self.mapping)
+            return "Perm({})({})".format(n, self.mapping)
 
         def table_format(self):
             """

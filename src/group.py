@@ -71,7 +71,7 @@ class Group:
     #                 start += 1
     #     return {perm.apply_mapping(keys) for perm in self.perms}, start
 
-    # def direct_product(self, other):
+    # def __mul__(self, other):
     #     """Returns the direct product of this group and another"""
     #     elements1, start = self.on_ints()
     #     elements2, _ = other.on_ints(start)
@@ -88,6 +88,9 @@ class Group:
         Check if two groups are isomorphic, this is hard lol
         """
         pass
+
+    def __str__(self):
+        return "{{{}}}".format(", ".join(map(str, self.perms)))
 
     @classmethod
     def generate(cls, n, elements, limit=math.inf):
