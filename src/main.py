@@ -44,6 +44,8 @@ if __name__ == "__main__":
     H = Group.symmetric(6)
     # print(H.is_closed())
     print(len(H.perms))
+    print(all(Group.dihedral(k).is_closed() for k in range(1, 10)))
+    print(all(Group.cyclic(k).is_closed() for k in range(1, 10)))
     for i, G in enumerate(groups_of_order(n)):
         pass
         # print("Group", i)

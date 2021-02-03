@@ -35,7 +35,8 @@ class Group:
         """
         Returns the cyclic group of order n
         """
-        return cls({tuple((j + i) % n for i in range(n)) for j in range(n)})
+        return cls({Perm(n)(tuple((j + i) % n for i in range(n)))
+                    for j in range(n)})
 
     @classmethod
     def dihedral(cls, n):
@@ -43,7 +44,8 @@ class Group:
         Returns the dihedral group of order 2n
         """
         rots = cls.cyclic(n).perms
-        refls = {tuple((j - i) % n for i in range(n)) for j in range(n)}
+        refls = {Perm(n)(tuple((j - i) % n for i in range(n)))
+                    for j in range(n)}
         return cls(rots | refls)
 
     @classmethod
