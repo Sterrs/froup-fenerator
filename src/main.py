@@ -4,6 +4,9 @@ from operator import mul
 from math import factorial
 from time import time
 
+# TODO: portable alternative
+from sympy import factorint
+
 from group import Group
 
 n = 6
@@ -22,7 +25,7 @@ def comb(n, k):
 
 def groups_of_order(n):
     start_time = time()
-    k = int(n/smallest_factor(n))
+    k = sum(factorint(n).values())
     N = comb(factorial(n), k)
     total_groups = 0
     for i, perms in enumerate(combinations(Group.symmetric(n).perms, k), 1):
