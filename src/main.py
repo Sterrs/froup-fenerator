@@ -5,9 +5,10 @@ from math import factorial
 from time import time
 
 # TODO: portable alternative
-from sympy import factorint
+from sympy import factorint, divisors
 
 from group import Group
+from perm import conjugacy_class
 
 n = 6
 UPDATE_INTERVAL = 10 ** 5
@@ -17,6 +18,21 @@ def smallest_factor(n):
     while n % i != 0:
         i += 1
     return i
+
+def good_cycle_types(n, lengths):
+    """Get cycle types in S_n which are composed of cycles from given lengths"""
+    if len(lengths) == 0:
+        return [[]]
+    m = lengths[0]
+    i = 0
+    cycle_types = []
+    while i * m <= n:
+        for cycle_type in good_cycle_types(n - i*m, lengths[1:]):
+            cycle_types.append(i * [m] + cycle_type)
+        i += 1
+    if cycle_types == []:
+        return [[]]
+    return cycle_types
 
 # my version of PyPy is too old for math.comb
 def comb(n, k):
@@ -41,13 +57,19 @@ def groups_of_order(n):
                   f" {total_groups}G")
 
 if __name__ == "__main__":
-    H = Group.symmetric(6)
+    for cycle_type in good_cycle_types(12, divisors(12)[1:]):
+        print(cycle_type)
+    # for perm in conjugacy_class(7, [2, 4]):
+    #     print(perm)
+    # H = Group.symmetric(6)
     # print(H.is_closed())
-    print(len(H.perms))
-    print(all(Group.dihedral(k).is_closed() for k in range(1, 10)))
-    print(all(Group.cyclic(k).is_closed() for k in range(1, 10)))
-    for i, G in enumerate(groups_of_order(n)):
-        pass
+    # for perm in H.perms:
+    #     print(perm, perm.cycle_type())
+    # print(len(H.perms))
+    # print(all(Group.dihedral(k).is_closed() for k in range(1, 10)))
+    # print(all(Group.cyclic(k).is_closed() for k in range(1, 10)))
+    # for i, G in enumerate(groups_of_order(n)):
+    #    pass
         # print("Group", i)
         # for perm in G.perms:
         #     print(perm)

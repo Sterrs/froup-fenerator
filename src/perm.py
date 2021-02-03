@@ -4,7 +4,7 @@
 Permutation class
 """
 
-import random
+import random, itertools
 
 from operator import eq
 from functools import lru_cache
@@ -99,6 +99,13 @@ def Perm(n):
         #     return type(self)({mapping[key]:mapping[value] for key, value in \
         #                     self.mapping.items()})
 
+        def cycle_type(self):
+            return sorted(map(len,
+                              self.disjoint_cycle_decomposition_unstable()))
+
+        def conjugate(self, g):
+            return self.inverse() * g * self
+
         def disjoint_cycle_decomposition_unstable(self):
             """
             Get a list of lists which is the disjoint cycle decomposition. _DON'T_
@@ -111,13 +118,13 @@ def Perm(n):
             while remaining:
                 a = remaining.pop()
                 cycle = [a]
-                b = self[a]
+                b = self.mapping[a]
                 # this could of course be done beautifully with the walrus operator,
                 # but I'm trying to keep my Ubuntu-using fans happy
                 while b != a:
                     remaining.remove(b)
                     cycle.append(b)
-                    b = self[b]
+                    b = self.mapping[b]
                 if len(cycle) > 1:
                     decomposition.append(cycle)
             return decomposition
@@ -160,7 +167,7 @@ def Perm(n):
             """
             inv_map = [None] * n
             for i in range(n):
-                inv_map[self.mapping[i]] = [i]
+                inv_map[self.mapping[i]] = i
             return type(self)(inv_map)
 
         def __str__(self):
@@ -265,3 +272,21 @@ def Perm(n):
                 order += 1
             return order
     return PermSn
+
+def conjugacy_class(n, cycle_type):
+    """
+    Return all permutations of a given cycle type
+
+    This is completely the wrong way to do it :D
+    """
+    conjugacy_class = set()
+    x = Perm(n)()
+    i = 0
+    for l in cycle_type:
+        x *= Perm(n).from_cycle(range(i, i+l))
+        i += l
+    for g in map(Perm(n), itertools.permutations(range(n))):
+        conjugacy_class.add(g.conjugate(x))
+    return conjugacy_class
+
+
