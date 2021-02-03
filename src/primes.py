@@ -38,17 +38,22 @@ def prime_factors(n):
     TODO: at least use the sieve of Eratosthenes or Atkin or something. Frankly
           we should be using something cool like Pollard's rho algorithm.
     """
-    for p in primes():
-        while not n % p:
-            yield p
-            n //= p
-        if n == 1:
-            break
+    if n > 1:
+        for p in primes():
+            if p * p > n:
+                yield n
+                break
+            while not n % p:
+                yield p
+                n //= p
+            if n == 1:
+                break
 
 if __name__ == "__main__":
     from itertools import islice
     print(list(islice(primes(), 100)))
-    for k in [6, 12, 36, 1001, 1001 ** 2, 1001 ** 3,
+    for k in [*range(1, 37), 1001, 1001 ** 2, 1001 ** 3,
               # primes:
-              1000003, 1000033, 1000037, 1000039, 1000081, 1000099]:
+              1000003, 1000033, 1000037, 1000039, 1000081, 1000099,
+              1000003 * 1000033, 1000033 ** 2]:
         print(f"{k} = {' * '.join(map(str, prime_factors(k)))}")
