@@ -126,3 +126,11 @@ class Group:
         #     if not self.generate_from(gh, *elements, limit=limit):
         #         return False
         # return True
+
+if __name__ == "__main__":
+    H = Group.symmetric(6)
+    print(len(H.perms))
+    print("Hopefully all true:")
+    print(H.is_closed())
+    print(all(Group.dihedral(k).is_closed() for k in range(1, 10)))
+    print(all(Group.cyclic(k).is_closed() for k in range(1, 10)))
