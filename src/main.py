@@ -10,7 +10,7 @@ from sympy import factorint, divisors
 from group import Group
 from perm import conjugacy_class
 
-n = 6
+n = 7
 UPDATE_INTERVAL = 10 ** 5
 
 def smallest_factor(n):
@@ -42,9 +42,14 @@ def comb(n, k):
 def groups_of_order(n):
     start_time = time()
     k = sum(factorint(n).values())
-    N = comb(factorial(n), k)
+    print("Computing usable permutations...")
+    perm_sets = [conjugacy_class(n, ct) for ct in
+                 good_cycle_types(n, divisors(n)[1:])]
+    valid_perms = set().union(*perm_sets)
+    print("Finished computing usable permutations!")
+    N = comb(len(valid_perms), k)
     total_groups = 0
-    for i, perms in enumerate(combinations(Group.symmetric(n).perms, k), 1):
+    for i, perms in enumerate(combinations(valid_perms, k), 1):
         G = Group.generate(n, perms, limit=n)
         if G is not None and len(G.perms) == n:
             yield G
@@ -57,8 +62,8 @@ def groups_of_order(n):
                   f" {total_groups}G")
 
 if __name__ == "__main__":
-    for cycle_type in good_cycle_types(12, divisors(12)[1:]):
-        print(cycle_type)
+    # for cycle_type in good_cycle_types(12, divisors(12)[1:]):
+    #     print(cycle_type)
     # for perm in conjugacy_class(7, [2, 4]):
     #     print(perm)
     # H = Group.symmetric(6)
@@ -68,8 +73,8 @@ if __name__ == "__main__":
     # print(len(H.perms))
     # print(all(Group.dihedral(k).is_closed() for k in range(1, 10)))
     # print(all(Group.cyclic(k).is_closed() for k in range(1, 10)))
-    # for i, G in enumerate(groups_of_order(n)):
-    #    pass
+    for i, G in enumerate(groups_of_order(n)):
+       pass
         # print("Group", i)
         # for perm in G.perms:
         #     print(perm)
