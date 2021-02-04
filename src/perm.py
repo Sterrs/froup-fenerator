@@ -281,15 +281,22 @@ def canonical_of_cycle_type(n, cycle_type):
         i += l
     return x
 
+def _conjugacy_class(n, values, cycle_type):
+    if cycle_type == []:
+        yield Perm(n)()
+        return
+    ct = cycle_type[0]
+    for choice in itertools.combinations(values, ct):
+        for g in map(Perm(n).from_cycle, itertools.permutations(choice)):
+            for h in _conjugacy_class(n,
+                    [v for v in values if v not in choice], cycle_type[1:]):
+                yield g * h
+
 def conjugacy_class(n, cycle_type):
     """
-    Return all permutations of a given cycle type
+    Return set of all permutations of a given cycle type
 
     This is completely the wrong way to do it :D
     """
-    x = canonical_of_cycle_type(n, cycle_type)
-    conjugacy_class = set()
-    for g in map(Perm(n), itertools.permutations(range(n))):
-        conjugacy_class.add(g.conjugate(x))
-    return conjugacy_class
+    return set(_conjugacy_class(n, list(range(n)), cycle_type))
 

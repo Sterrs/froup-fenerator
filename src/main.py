@@ -10,7 +10,7 @@ from sympy import factorint, divisors
 from group import Group
 from perm import conjugacy_class, canonical_of_cycle_type
 
-n = 9
+n = 6
 UPDATE_INTERVAL = 10 ** 5
 
 def smallest_factor(n):
@@ -71,8 +71,6 @@ def groups_of_order(n):
 if __name__ == "__main__":
     # for cycle_type in good_cycle_types(12, divisors(12)[1:]):
     #     print(cycle_type)
-    # for perm in conjugacy_class(7, [2, 4]):
-    #     print(perm)
     # H = Group.symmetric(6)
     # print(H.is_closed())
     # for perm in H.perms:
