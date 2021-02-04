@@ -184,7 +184,7 @@ def Perm(n):
             """
             Show the underlying dictionary object
             """
-            return "{}({})".format(type(self).__name__, self.mapping)
+            return "Perm({})({})".format(n, self.mapping)
 
         def table_format(self):
             """
