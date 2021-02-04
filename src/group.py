@@ -119,15 +119,27 @@ class Group:
 
     def is_isomorphic(self, other):
         """
-        Check if two groups are isomorphic,
-        I thought this would be hard lol
+        Check if two groups are isomorphic
         """
-        if self.order_sequence() != other.order_sequence():
+        ordseq = self.order_sequence()
+        if ordseq != other.order_sequence():
             return False
-        tuple_perms = tuple(self.perms)
-        for tuple_mapping in itertools.permutations(other.perms):
-            if self.is_isomorphism(other, lambda g:
-                    tuple_mapping[tuple_perms.index(g)]):
+        orders = list(set(ordseq))
+        # Partitions permutations of both groups into lists of elements with the
+        # same order
+        self_order_list = [[g for g in self.perms if g.order() == i]
+                for i in orders]
+        other_order_list = [[g for g in other.perms if g.order() == i]
+                for i in orders]
+        # Iterate over permutations within elements of a given order
+        for mappings in itertools.product(*[itertools.permutations(l) for l in
+            self_order_list]):
+            def mapping(g):
+                order = g.order()
+                i = orders.index(order)
+                index = mappings[i].index(g)
+                return other_order_list[i][index]
+            if self.is_isomorphism(other, mapping):
                 return True
         return False
 
