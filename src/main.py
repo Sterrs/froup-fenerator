@@ -91,8 +91,18 @@ def groups_of_order(n):
             i += 1
 
 if __name__ == "__main__":
+    unique = []
     for i, G in enumerate(groups_of_order(n)):
-        pass
+        for H in unique:
+            if G.is_isomorphic(H):
+                break
+        else:
+            unique.append(G)
+    for i, G in enumerate(unique, 1):
+        print("Group", i)
+        for perm in G.perms:
+            print(perm)
+        print(perm)
         # print("Group", i)
         # print(G)
         # assert G.is_closed()

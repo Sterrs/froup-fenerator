@@ -103,11 +103,26 @@ class Group:
         """
         pass
 
+    def is_isomorphism(self, other, mapping):
+        """
+        Check if the function mapping defines an isomorphism from this group to
+        another
+        """
+        return all((mapping(g) * mapping(h) == mapping(g * h) for
+                g in self.perms for h in self.perms))
+
     def is_isomorphic(self, other):
         """
         Check if two groups are isomorphic, this is hard lol
         """
-        pass
+        if len(self) != len(other):
+            return False
+        tuple_perms = tuple(self.perms)
+        for tuple_mapping in itertools.permutations(other.perms):
+            if self.is_isomorphism(other, lambda g:
+                    tuple_mapping[tuple_perms.index(g)]):
+                return True
+        return False
 
     def __str__(self):
         """
