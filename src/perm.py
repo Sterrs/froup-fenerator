@@ -35,7 +35,28 @@ def Perm(n):
             Create a permutation directly by providing a dictionary map. Given no
             argument, returns an identity permutation.
             """
+            # assert len(mapping) == n
             self.mapping = mapping
+
+        def pad_before(self, m):
+            """
+            Poorly-named method which converts this to a permuation on the
+            integers m, ..., m + n. (with values below m fixed)
+            This is to facilitate the direct product.
+            """
+            return Perm(m + n)(tuple(range(m)) +
+                    tuple((i + m for i in self.mapping)))
+
+        def pad_after(self, m):
+            """
+            Poorly named method which 'coerces' this permutation to a
+            permutation on 1, ..., n + m
+            """
+            return Perm(n + m)(tuple(self.mapping) + tuple(range(n, n+m)))
+
+        def __len__(self):
+            """:o"""
+            return n
 
         @classmethod
         def from_cycle(cls, cycle):

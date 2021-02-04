@@ -91,11 +91,17 @@ class Group:
     #                 start += 1
     #     return {perm.apply_mapping(keys) for perm in self.perms}, start
 
-    # def __mul__(self, other):
-    #     """Returns the direct product of this group and another"""
-    #     elements1, start = self.on_ints()
-    #     elements2, _ = other.on_ints(start)
-    #     return type(self)({a * b for a in elements1 for b in elements2})
+    def __mul__(self, other):
+        """Returns the direct product of this group and another"""
+        # Wow okay gross
+        for a in self.perms:
+            break
+        for b in other.perms:
+            break
+        self_padded_perms = [g.pad_after(len(b)) for g in self.perms]
+        other_padded_perms = [g.pad_before(len(a)) for g in other.perms]
+        return type(self)({g * h for g in self_padded_perms
+                                 for h in other_padded_perms})
 
     def automorphism_group(self):
         """
@@ -113,9 +119,10 @@ class Group:
 
     def is_isomorphic(self, other):
         """
-        Check if two groups are isomorphic, this is hard lol
+        Check if two groups are isomorphic,
+        I thought this would be hard lol
         """
-        if len(self) != len(other):
+        if self.order_sequence() != other.order_sequence():
             return False
         tuple_perms = tuple(self.perms)
         for tuple_mapping in itertools.permutations(other.perms):
