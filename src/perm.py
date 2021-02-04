@@ -273,20 +273,23 @@ def Perm(n):
             return order
     return PermSn
 
+def canonical_of_cycle_type(n, cycle_type):
+    x = Perm(n)()
+    i = 0
+    for l in cycle_type:
+        x *= Perm(n).from_cycle(range(i, i+l))
+        i += l
+    return x
+
 def conjugacy_class(n, cycle_type):
     """
     Return all permutations of a given cycle type
 
     This is completely the wrong way to do it :D
     """
+    x = canonical_of_cycle_type(n, cycle_type)
     conjugacy_class = set()
-    x = Perm(n)()
-    i = 0
-    for l in cycle_type:
-        x *= Perm(n).from_cycle(range(i, i+l))
-        i += l
     for g in map(Perm(n), itertools.permutations(range(n))):
         conjugacy_class.add(g.conjugate(x))
     return conjugacy_class
-
 
