@@ -4,10 +4,10 @@
 Permutation class
 """
 
-import random, itertools
+import random, itertools, math
 
-from operator import eq
-from functools import lru_cache
+from operator import eq, mul
+from functools import lru_cache, reduce
 
 # TODO: write dummy tests
 
@@ -302,22 +302,59 @@ def canonical_of_cycle_type(n, cycle_type):
         i += l
     return x
 
-def _conjugacy_class(n, values, cycle_type):
+def size_of_conj_class(n, cycle_type):
+    """cycle_type should not include 1s"""
+    if cycle_type == []:
+        return 1
+    # List of cycle lengths, no repeats
+    cycle_lengths = list(set(cycle_type))
+    # Numbers of cycles of corresponding length, starting with 1
+    number_of_cycles = [n - sum(cycle_type)] + [sum(1 for i in cycle_type if i == m) for m in
+            cycle_lengths]
+    # Add in the fact that the first cycle length is 1
+    cycle_lengths = [1] + cycle_lengths
+
+    # Apply formula
+    gen = (math.factorial(k)*(m**k) for k, m in zip(number_of_cycles,
+        cycle_lengths))
+    return math.factorial(n) // reduce(mul, gen)
+
+def single_length_conj_class(n, m, l, values):
+    """
+    Generate all perms in S_n composed of m cycles of length l
+    l > 1
+    Also yields the elements it 'used'
+    """
+    if m == 0:
+        yield Perm(n)(), []
+    # 'fix' i in the first cycle, to prevent repeats
+    for i, v in enumerate(values, 1):
+        # Generate l cycles starting with i
+        for t in itertools.permutations(values[i:], l-1):
+            g = Perm(n).from_cycle((v,) + t)
+            for h, used in single_length_conj_class(n, m-1, l,
+                    [v for v in values[i:] if v not in t]):
+                yield g * h, [v] + list(t) + used
+
+def conjugacy_class(n, cycle_type, values=None):
+    """
+    Generate all perms of given cycle type
+    I've only tested this with increasing cycle types
+
+    Help I can't stop writing recursive functions
+    """
+    if values is None:
+        values = range(n)
     if cycle_type == []:
         yield Perm(n)()
         return
-    ct = cycle_type[0]
-    for choice in itertools.combinations(values, ct):
-        for g in map(Perm(n).from_cycle, itertools.permutations(choice)):
-            for h in _conjugacy_class(n,
-                    [v for v in values if v not in choice], cycle_type[1:]):
-                yield g * h
+    # Length of first cycle
+    l = cycle_type[0]
+    # Number of cycles of same length
+    m = sum(1 for i in cycle_type if i == l)
 
-def conjugacy_class(n, cycle_type):
-    """
-    Return set of all permutations of a given cycle type
-
-    This is completely the wrong way to do it :D
-    """
-    return set(_conjugacy_class(n, list(range(n)), cycle_type))
+    for g, used in single_length_conj_class(n, m, l, values):
+        for h in conjugacy_class(n, [i for i in cycle_type if i != l],
+                [v for v in values if v not in used]):
+            yield g * h
 

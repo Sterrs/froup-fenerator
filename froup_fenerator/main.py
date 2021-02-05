@@ -1,15 +1,16 @@
-from itertools import combinations
+from itertools import combinations, chain
 from functools import reduce
 from operator import mul
 from math import factorial, inf
 from time import time
 
 from group import Group
-from perm import conjugacy_class, canonical_of_cycle_type
+from perm import conjugacy_class, canonical_of_cycle_type, size_of_conj_class,\
+single_length_conj_class
 from primes import prime_factors, factors
 
 # TODO: argparse
-n = 8
+n = 11
 UPDATE_INTERVAL = 10 ** 5
 
 def upper_bound_generating_set(n):
@@ -67,20 +68,15 @@ def comb(n, k):
 def groups_of_order(n):
     start_time = time()
     k = upper_bound_generating_set(n)
-    print("Computing usable permutations...")
     good_cts = good_cycle_types(n, list(factors(n))[1:])
-    if k == 1:
-        valid_perms = []
-    else:
-        perm_sets = [conjugacy_class(n, ct) for ct in good_cts]
-        valid_perms = set().union(*perm_sets)
-    print("Finished computing usable permutations!")
-    N = len(good_cts) * comb(len(valid_perms), k-1)
+    N = len(good_cts) * comb(sum(size_of_conj_class(n, ct) for ct in good_cts),
+            k-1)
     total_groups = 0
     i = 1
     for ct in good_cts:
         x = canonical_of_cycle_type(n, ct)
-        for perms in combinations(valid_perms, k-1):
+        for perms in combinations(chain(*(conjugacy_class(n, ct) for ct in
+            good_cts)), k-1):
             G = Group.generate(n, (x,) + perms, limit=n)
             if G is not None and len(G.perms) == n:
                 yield G
@@ -99,6 +95,7 @@ if __name__ == "__main__":
     C2 = Group.cyclic(2)
     D12 = Group.dihedral(6)
     print("D6 * C2 ~= D12 is", D12.is_isomorphic(C2*D6))
+
     unique = []
     for i, G in enumerate(groups_of_order(n)):
         for H in unique:
@@ -111,5 +108,4 @@ if __name__ == "__main__":
         print("Group", i)
         for perm in G.perms:
             print(perm)
-        print(perm)
 
