@@ -14,6 +14,8 @@ def is_prime(p):
     """
     Primality testing by dumb trial division
     """
+    if p < 2:
+        return False
     for i in possible_primes():
         if i * i > p:
             return True
