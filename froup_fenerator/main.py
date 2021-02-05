@@ -1,7 +1,7 @@
 from itertools import combinations
 from functools import reduce
 from operator import mul
-from math import factorial
+from math import factorial, inf
 from time import time
 
 from group import Group
@@ -9,7 +9,7 @@ from perm import conjugacy_class, canonical_of_cycle_type
 from primes import prime_factors, factors
 
 # TODO: argparse
-n = 6
+n = 8
 UPDATE_INTERVAL = 10 ** 5
 
 def upper_bound_generating_set(n):
@@ -40,7 +40,12 @@ def upper_bound_generating_set(n):
     return sum(1 for _ in prime_factors(n))
 
 def good_cycle_types(n, lengths):
-    """Get cycle types in S_n which are composed of cycles from given lengths"""
+    """
+    Get cycle types in S_n which are composed of cycles from given lengths
+
+    I really don't trust this recursive approach, let's either rewrite or test
+    it a lot
+    """
     if len(lengths) == 0:
         return [[]]
     m = lengths[0]
@@ -57,20 +62,20 @@ def good_cycle_types(n, lengths):
 # my version of PyPy is too old for math.comb
 def comb(n, k):
     k = max(k, n - k)
-    return reduce(mul, range(k + 1, n + 1)) // factorial(n - k)
+    return reduce(mul, range(k + 1, n + 1), 1) // factorial(n - k)
 
 def groups_of_order(n):
     start_time = time()
     k = upper_bound_generating_set(n)
     print("Computing usable permutations...")
     good_cts = good_cycle_types(n, list(factors(n))[1:])
-    perm_sets = [conjugacy_class(n, ct) for ct in good_cts]
-    valid_perms = set().union(*perm_sets)
-    print("Finished computing usable permutations!")
     if k == 1:
-        N = len(good_cts)
+        valid_perms = []
     else:
-        N = len(good_cts) * comb(len(valid_perms), k-1)
+        perm_sets = [conjugacy_class(n, ct) for ct in good_cts]
+        valid_perms = set().union(*perm_sets)
+    print("Finished computing usable permutations!")
+    N = len(good_cts) * comb(len(valid_perms), k-1)
     total_groups = 0
     i = 1
     for ct in good_cts:
@@ -82,7 +87,8 @@ def groups_of_order(n):
                 total_groups += 1
             if i % UPDATE_INTERVAL == 0 or i == N or i == 1:
                 elapsed = time() - start_time
-                print(f"{i:{len(str(N))}}/{N} ({i / N:7.2%}) {i / elapsed:.0f}/s"
+                print(f"{i:{len(str(N))}}/{N} ({i / N:7.2%}) "
+                    f"{i / elapsed if elapsed != 0.0 else inf:.0f}/s"
                     f" ETA{(N - i) * elapsed / i / 60:.0f}m"
                     f" ({(N - i) * elapsed / i / 60 ** 2:.1f}h)"
                     f" {total_groups}G")
@@ -101,6 +107,7 @@ if __name__ == "__main__":
         else:
             unique.append(G)
     for i, G in enumerate(unique, 1):
+        assert G.is_closed()
         print("Group", i)
         for perm in G.perms:
             print(perm)
