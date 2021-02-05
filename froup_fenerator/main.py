@@ -72,11 +72,13 @@ def groups_of_order(n):
     N = len(good_cts) * comb(sum(size_of_conj_class(n, ct) for ct in good_cts),
             k-1)
     total_groups = 0
+    # Total hack to optimise prime case lol
+    cts = good_cts if k != 1 else []
     i = 1
     for ct in good_cts:
         x = canonical_of_cycle_type(n, ct)
-        for perms in combinations(chain(*(conjugacy_class(n, ct) for ct in
-            good_cts)), k-1):
+        for perms in combinations(chain(*(conjugacy_class(n, ct) for ct in cts)),
+                k-1):
             G = Group.generate(n, (x,) + perms, limit=n)
             if G is not None and len(G.perms) == n:
                 yield G
