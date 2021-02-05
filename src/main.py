@@ -4,11 +4,9 @@ from operator import mul
 from math import factorial
 from time import time
 
-from sympy import divisors
-
 from group import Group
 from perm import conjugacy_class, canonical_of_cycle_type
-from primes import prime_factors
+from primes import prime_factors, factors
 
 # TODO: argparse
 n = 6
@@ -65,7 +63,7 @@ def groups_of_order(n):
     start_time = time()
     k = upper_bound_generating_set(n)
     print("Computing usable permutations...")
-    good_cts = good_cycle_types(n, divisors(n)[1:])
+    good_cts = good_cycle_types(n, list(factors(n))[1:])
     perm_sets = [conjugacy_class(n, ct) for ct in good_cts]
     valid_perms = set().union(*perm_sets)
     print("Finished computing usable permutations!")
@@ -95,19 +93,16 @@ if __name__ == "__main__":
     C2 = Group.cyclic(2)
     D12 = Group.dihedral(6)
     print("D6 * C2 ~= D12 is", D12.is_isomorphic(C2*D6))
-    # unique = []
-    # for i, G in enumerate(groups_of_order(n)):
-    #     for H in unique:
-    #         if G.is_isomorphic(H):
-    #             break
-    #     else:
-    #         unique.append(G)
-    # for i, G in enumerate(unique, 1):
-    #     print("Group", i)
-    #     for perm in G.perms:
-    #         print(perm)
-    #     print(perm)
-    #     # print("Group", i)
-    #     # print(G)
-    #     # assert G.is_closed()
+    unique = []
+    for i, G in enumerate(groups_of_order(n)):
+        for H in unique:
+            if G.is_isomorphic(H):
+                break
+        else:
+            unique.append(G)
+    for i, G in enumerate(unique, 1):
+        print("Group", i)
+        for perm in G.perms:
+            print(perm)
+        print(perm)
 

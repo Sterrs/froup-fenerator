@@ -49,6 +49,12 @@ def prime_factors(n):
             if n == 1:
                 break
 
+def factors(n):
+    """
+    Very bad and slow generator to get the factors of a number
+    """
+    return (i for i in range(1, n+1) if n % i == 0)
+
 if __name__ == "__main__":
     from itertools import islice
     print(list(islice(primes(), 100)))
