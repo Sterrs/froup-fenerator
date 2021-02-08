@@ -1,7 +1,7 @@
 from itertools import combinations, chain
 from functools import reduce
 from operator import mul
-from math import factorial, inf
+from math import factorial, inf, gcd
 from time import time
 
 from group import Group
@@ -10,7 +10,7 @@ single_length_conj_class
 from primes import prime_factors, factors
 
 # TODO: argparse
-n = 8
+n = 6
 UPDATE_INTERVAL = 10 ** 5
 
 def upper_bound_generating_set(n):
@@ -68,10 +68,15 @@ def comb(n, k):
 def groups_of_order(n):
     start_time = time()
     k = upper_bound_generating_set(n)
-    # Don't check [] or [n] cycle types
-    good_cts = good_cycle_types(n, list(factors(n))[1:])[2:]
+    # Don't check [] cycle type
+    good_cts = good_cycle_types(n, list(factors(n))[1:])[1:]
+    # Don't check cycle types which give order n
+    good_cts = [ct for ct in good_cts if reduce(lambda m, n: m * n // gcd(m, n),
+        ct) < n]
+    print(good_cts)
     N = len(good_cts) * comb(sum(size_of_conj_class(n, ct) for ct in good_cts),
             k-1)
+    print(N)
     total_groups = 0
     # Total hack to optimise prime case lol
     cts = good_cts if k != 1 else []
