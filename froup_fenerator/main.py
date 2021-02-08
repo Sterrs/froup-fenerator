@@ -10,7 +10,7 @@ single_length_conj_class
 from primes import prime_factors, factors
 
 # TODO: argparse
-n = 11
+n = 8
 UPDATE_INTERVAL = 10 ** 5
 
 def upper_bound_generating_set(n):
@@ -68,7 +68,8 @@ def comb(n, k):
 def groups_of_order(n):
     start_time = time()
     k = upper_bound_generating_set(n)
-    good_cts = good_cycle_types(n, list(factors(n))[1:])
+    # Don't check [] or [n] cycle types
+    good_cts = good_cycle_types(n, list(factors(n))[1:])[2:]
     N = len(good_cts) * comb(sum(size_of_conj_class(n, ct) for ct in good_cts),
             k-1)
     total_groups = 0
@@ -76,6 +77,7 @@ def groups_of_order(n):
     cts = good_cts if k != 1 else []
     i = 1
     for ct in good_cts:
+        print("New cycle type:", ct)
         x = canonical_of_cycle_type(n, ct)
         for perms in combinations(chain(*(conjugacy_class(n, ct) for ct in cts)),
                 k-1):
@@ -93,21 +95,22 @@ def groups_of_order(n):
             i += 1
 
 if __name__ == "__main__":
-    D6 = Group.dihedral(3)
-    C2 = Group.cyclic(2)
-    D12 = Group.dihedral(6)
-    print("D6 * C2 ~= D12 is", D12.is_isomorphic(C2*D6))
+    # D6 = Group.dihedral(3)
+    # C2 = Group.cyclic(2)
+    # D12 = Group.dihedral(6)
+    # print("D6 * C2 ~= D12 is", D12.is_isomorphic(C2*D6))
 
-    unique = []
+    # unique = []
     for i, G in enumerate(groups_of_order(n)):
-        for H in unique:
-            if G.is_isomorphic(H):
-                break
-        else:
-            unique.append(G)
-    for i, G in enumerate(unique, 1):
-        assert G.is_closed()
-        print("Group", i)
-        for perm in G.perms:
-            print(perm)
+        pass
+        # for H in unique:
+        #     if G.is_isomorphic(H):
+        #         break
+        # else:
+        #     unique.append(G)
+    # for i, G in enumerate(unique, 1):
+    #     assert G.is_closed()
+    #     print("Group", i)
+    #     for perm in G.perms:
+    #         print(perm)
 
